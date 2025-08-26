@@ -1,14 +1,21 @@
-from smolagents import Tool
-from ..retrievers.vectorstore import VectorStoreRetriever
+from argparse import ArgumentParser
+from smolagents import Tool, OpenAIServerModel, CodeAgent
+from rag_ed.retrievers.vectorstore import VectorStoreRetriever
 
 
 class RetrieverTool(Tool):
     name = "retriever"
-    description = "Uses semantic search to retrieve the parts of transformers documentation that could be most relevant to answer your query."
+    description = (
+        "Uses semantic search to retrieve the parts of transformers documentation that could be most relevant "
+        "to answer your query."
+    )
     inputs = {
         "query": {
             "type": "string",
-            "description": "The query to perform. This should be semantically close to your target documents. Use the affirmative form rather than a question.",
+            "description": (
+                "The query to perform. This should be semantically close to your target documents. "
+                "Use the affirmative form rather than a question."
+            ),
         }
     }
     output_type = "string"
@@ -34,8 +41,18 @@ retriever_tool = RetrieverTool(
     piazza_path="/Users/work/Downloads/piazza.zip",
 )
 
-from smolagents import OpenAIServerModel, CodeAgent
-
 agent = CodeAgent(
     tools=[retriever_tool], model=OpenAIServerModel(), max_steps=4, verbosity_level=2
 )
+
+
+def main() -> None:
+    """CLI entry point for the self-querying retriever agent."""
+    parser = ArgumentParser(description="Self-querying retriever agent demo.")
+    parser.add_argument("query", help="Query to perform.")
+    args = parser.parse_args()
+    print(agent.run(args.query))
+
+
+if __name__ == "__main__":
+    main()

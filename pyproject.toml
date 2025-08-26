@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-ed"
+version = "0.1.0"
+description = "Retrieval-augmented generation utilities for education."
+authors = [{ name = "Unknown", email = "unknown@example.com" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.8"
+dependencies = [
+    "langchain-core",
+    "langchain-community",
+    "unstructured",
+    "pdfminer.six==20221105",
+    "pi_heif",
+    "unstructured-inference",
+    "tqdm",
+    "pdf2image",
+    "unstructured-pytesseract",
+    "jq",
+    "smolagents",
+    "langchain-openai",
+]
+
+[project.optional-dependencies]
+dev = ["black"]
+
+[project.scripts]
+rag-ed-vanilla-rag = "rag_ed.agents.vanilla_rag:main"
+rag-ed-self-query = "rag_ed.agents.self_querying_retriever_agent:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rag_ed*"]

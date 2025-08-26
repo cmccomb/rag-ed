@@ -2,14 +2,12 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS, InMemoryVectorStore
 
-from ..loaders.canvas import CanvasLoader
-from ..loaders.piazza import PiazzaLoader
+from rag_ed.loaders.canvas import CanvasLoader
+from rag_ed.loaders.piazza import PiazzaLoader
 
 
 class VectorStoreRetriever:
-    """
-    A retriever that uses CanvasLoader and PiazzaLoader to load documents and perform vector retrieval.
-    """
+    """A retriever that uses CanvasLoader and PiazzaLoader to load documents and perform vector retrieval."""
 
     def __init__(
         self,
@@ -17,8 +15,7 @@ class VectorStoreRetriever:
         piazza_path: str,
         in_memory: bool = False,
     ):
-        """
-        Initialize the retriever with the desired vector storage type.
+        """Initialize the retriever with the desired vector storage type.
 
         Args:
             canvas_path (str): Path to the Canvas .imscc file.
@@ -52,8 +49,7 @@ class VectorStoreRetriever:
             self.vector_store = FAISS.from_documents(documents, embeddings)
 
     def retrieve(self, query: str, k: int = 5):
-        """
-        Retrieve the top-k documents matching the query.
+        """Retrieve the top-k documents matching the query.
 
         Args:
             query (str): The query string.
