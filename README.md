@@ -54,9 +54,8 @@ Runs a single-step retrieval using the provided Canvas and Piazza data.
 git clone https://github.com/yourusername/rag-ed.git
 cd rag-ed
 pip install .[dev]
-ruff check .
-black .
-mypy .
+pre-commit install
+pre-commit run --files <paths>
 pytest
 ```
 
