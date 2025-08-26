@@ -1,6 +1,6 @@
 # rag-ed
 
-[![CI](https://github.com/yourusername/rag-ed/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/rag-ed/actions/workflows/ci.yml)
+[![CI](https://github.com/cmccomb/rag-ed/actions/workflows/ci.yml/badge.svg)](https://github.com/cmccomb/rag-ed/actions/workflows/ci.yml)
 
 ## What & Why
 
