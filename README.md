@@ -28,11 +28,18 @@ answer = one_step_retrieval(
 print(answer)
 ```
 
+```python
+from rag_ed.loaders.piazza_api import PiazzaAPILoader
+
+posts = PiazzaAPILoader("network_id", email="user@example.com", password="pw").load()
+```
+
 ## Config
 
 - **Canvas export**: `.imscc` archive of your course.
 - **Piazza export**: `.zip` archive downloaded from Piazza.
 - **OPENAI_API_KEY**: authentication token for OpenAI's API.
+- **PIAZZA_API_EMAIL / PIAZZA_API_PASSWORD**: credentials for the Piazza API loader.
 
 ## CLI / API Reference
 

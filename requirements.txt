@@ -19,3 +19,4 @@ requests
 langchain-openai
 types-requests
 networkx
+piazza-api

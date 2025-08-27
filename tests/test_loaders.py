@@ -1,12 +1,14 @@
 from pathlib import Path
 import datetime
 import time
+from typing import Iterable
 
 import pytest
 
 from rag_ed.loaders.canvas import CanvasLoader
 from rag_ed.loaders.canvas_api import CanvasAPILoader
 from rag_ed.loaders.piazza import PiazzaLoader
+from rag_ed.loaders.piazza_api import PiazzaAPILoader
 from tests.imscc_utils import generate_imscc
 from tests.piazza_utils import generate_piazza_export
 
@@ -169,3 +171,52 @@ def test_piazza_loader_missing_file() -> None:
         match="Piazza file 'does_not_exist.zip' does not exist or is not a file.",
     ):
         PiazzaLoader("does_not_exist.zip")
+
+
+def test_piazza_api_loader_fetches_posts(monkeypatch: pytest.MonkeyPatch) -> None:
+    posts = [
+        {
+            "id": "p1",
+            "nr": 1,
+            "history": [
+                {
+                    "subject": "Hello",
+                    "content": "<p>World</p>",
+                    "created": "2024-01-01T00:00:00Z",
+                }
+            ],
+        },
+        {
+            "id": "p2",
+            "nr": 2,
+            "history": [
+                {
+                    "subject": "Another",
+                    "content": "<p>Post</p>",
+                    "created": "2024-01-02T00:00:00Z",
+                }
+            ],
+        },
+    ]
+
+    class FakeNetwork:
+        def iter_all_posts(self) -> Iterable[dict[str, object]]:
+            return iter(posts)
+
+    class FakePiazza:
+        def user_login(self, *, email: str, password: str) -> None:
+            assert email == "e"
+            assert password == "p"
+
+        def network(self, network_id: str) -> FakeNetwork:
+            assert network_id == "nid"
+            return FakeNetwork()
+
+    monkeypatch.setattr("rag_ed.loaders.piazza_api.Piazza", FakePiazza)
+
+    loader = PiazzaAPILoader("nid", email="e", password="p")
+    docs = loader.load()
+
+    assert len(docs) == 2
+    assert docs[0].metadata["source"] == "https://piazza.com/class/nid/post/1"
+    assert "Hello" in docs[0].page_content
