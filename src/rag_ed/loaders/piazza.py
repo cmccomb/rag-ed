@@ -1,6 +1,4 @@
-"""
-This file contains the PiazzaLoader class, which is responsible for loading files from Piazza
-"""
+"""Piazza course loader."""
 
 import datetime
 import os
@@ -11,18 +9,19 @@ import langchain_core.document_loaders
 import langchain_core.documents
 import tqdm
 
+from .utils import extract_zip
+
 
 class PiazzaLoader(langchain_core.document_loaders.BaseLoader):
-    """
-    The PiazzaLoader class is responsible for loading files from a zipped file which can be exported from Piazza.
-    """
+    """Load documents from a Piazza export archive."""
 
     def __init__(self, file_path: str) -> None:
-        """
-        Initialize the PiazzaLoader with the path to the zipped file.
+        """Create a loader for ``file_path``.
 
-        Args:
-            file_path (str): The path to the zipped file.
+        Parameters
+        ----------
+        file_path:
+            Path to the Piazza ``.zip`` export.
         """
         path = Path(file_path)
         if not path.is_file():
@@ -32,35 +31,9 @@ class PiazzaLoader(langchain_core.document_loaders.BaseLoader):
         self.course = path.stem
 
     def load(self) -> list[langchain_core.documents.Document]:
-        """Load the files from the zipped Piazza export.
-
-        Returns:
-            list[Document]: A list of loaded documents.
-        """
-        list_of_files_to_load = self._unzip_piazza_file()
-        return self._load_files(list_of_files_to_load)
-
-    def _unzip_piazza_file(self) -> list[str]:
-        """
-        Unzip the file to a temporary location, recursively traverse the file tree of the unzipped directory,
-        and return a list of files to load.
-
-        Returns:
-            list: A list of file paths to load.
-        """
-        import zipfile
-        import tempfile
-
-        temp_dir = tempfile.mkdtemp()
-        with zipfile.ZipFile(self.zipped_file_path, "r") as zip_ref:
-            zip_ref.extractall(temp_dir)
-
-        file_paths = []
-        for root, _, files in tqdm.tqdm(os.walk(temp_dir)):
-            for file in files:
-                file_paths.append(os.path.join(root, file))
-
-        return file_paths
+        """Load all documents from the archive."""
+        file_paths = extract_zip(self.zipped_file_path)
+        return self._load_files(file_paths)
 
     def _load_files(
         self, list_of_files_to_load: list[str]
