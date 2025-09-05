@@ -11,6 +11,8 @@
 ```bash
 pip install rag-ed
 vanilla-rag --canvas path/to/export.imscc --piazza path/to/export.zip "What is due next week?"
+# run offline and return retrieved documents
+vanilla-rag --pass-through --canvas path/to/export.imscc --piazza path/to/export.zip "Piazza"
 ```
 
 The CLI expects an OpenAI API key in the `OPENAI_API_KEY` environment variable.
@@ -26,6 +28,18 @@ answer = one_step_retrieval(
     piazza_path="piazza.zip",
 )
 print(answer)
+
+# offline pass-through mode
+from rag_ed.embeddings import PassThroughEmbeddings
+
+docs = one_step_retrieval(
+    "Piazza",
+    canvas_path="course.imscc",
+    piazza_path="piazza.zip",
+    pass_through=True,
+    embeddings=PassThroughEmbeddings(),
+)
+print(docs)
 ```
 
 ```python
