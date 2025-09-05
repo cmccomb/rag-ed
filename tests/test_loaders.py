@@ -11,6 +11,7 @@ from rag_ed.loaders.piazza import PiazzaLoader
 from rag_ed.loaders.piazza_api import PiazzaAPILoader
 from tests.imscc_utils import generate_imscc
 from tests.piazza_utils import generate_piazza_export
+from rag_ed.loaders.utils import extract_zip
 
 
 def test_canvas_loader_returns_document(tmp_path: Path) -> None:
@@ -153,6 +154,15 @@ def test_canvas_api_loader_respects_rate_limits(
         loader.load()
 
     assert called == [1]
+
+
+def test_extract_zip_lists_files(tmp_path: Path) -> None:
+    canvas = generate_imscc(tmp_path / "course.imscc")
+    piazza = generate_piazza_export(tmp_path / "piazza.zip")
+    canvas_files = extract_zip(str(canvas))
+    piazza_files = extract_zip(str(piazza))
+    assert any(p.endswith("imsmanifest.xml") for p in canvas_files)
+    assert any(p.endswith("config.json") for p in piazza_files)
 
 
 def test_piazza_loader_returns_document(tmp_path: Path) -> None:

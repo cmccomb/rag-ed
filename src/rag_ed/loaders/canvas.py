@@ -1,6 +1,4 @@
-"""
-This file contains the CanvasLoader class, which is responsible for loading files from Canvas
-"""
+"""Canvas course loader."""
 
 import datetime
 import os
@@ -19,6 +17,8 @@ from langchain_community.document_loaders import (
 from langchain_core.document_loaders import BaseLoader
 from langchain_core.documents import Document
 import tqdm
+
+from .utils import extract_zip
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".bmp"}
@@ -41,16 +41,15 @@ FILE_LOADERS: dict[str, type[BaseLoader]] = {
 
 
 class CanvasLoader(BaseLoader):
-    """
-    The CanvasLoader class is responsible for loading files from a zipped .imscc file which can be exported from Canvas.
-    """
+    """Load documents from a Canvas ``.imscc`` archive."""
 
     def __init__(self, file_path: str) -> None:
-        """
-        Initialize the CanvasLoader with the path to the zipped .imscc file.
+        """Create a loader for ``file_path``.
 
-        Args:
-            file_path (str): The path to the zipped .imscc file.
+        Parameters
+        ----------
+        file_path:
+            Path to the Canvas ``.imscc`` export.
         """
         path = Path(file_path)
         if not path.is_file():
@@ -60,35 +59,9 @@ class CanvasLoader(BaseLoader):
         self.course = path.stem
 
     def load(self) -> list[Document]:
-        """Load the files from the zipped .imscc file.
-
-        Returns:
-            list[Document]: A list of loaded documents.
-        """
-        list_of_files_to_load = self._unzip_imscc_file()
-        return self._load_files(list_of_files_to_load)
-
-    def _unzip_imscc_file(self) -> list[str]:
-        """
-        Unzip the .imscc file to a temporary location, recursively traverse the file tree of the unzipped directory,
-        and return a list of files to load.
-
-        Returns:
-            list: A list of file paths to load.
-        """
-        import zipfile
-        import tempfile
-
-        temp_dir = tempfile.mkdtemp()
-        with zipfile.ZipFile(self.zipped_file_path, "r") as zip_ref:
-            zip_ref.extractall(temp_dir)
-
-        file_paths = []
-        for root, _, files in tqdm.tqdm(os.walk(temp_dir)):
-            for file in files:
-                file_paths.append(os.path.join(root, file))
-
-        return file_paths
+        """Load all documents from the archive."""
+        file_paths = extract_zip(self.zipped_file_path)
+        return self._load_files(file_paths)
 
     def _load_files(self, list_of_files_to_load: list[str]) -> list[Document]:
         """

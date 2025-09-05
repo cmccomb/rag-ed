@@ -23,11 +23,7 @@ class DummyEmbeddings(Embeddings):
         return [float(len(text))]
 
 
-def test_vector_store_retriever(monkeypatch, tmp_path: Path) -> None:
-    monkeypatch.setattr(
-        langchain_openai.embeddings, "OpenAIEmbeddings", DummyEmbeddings
-    )
-
+def test_vector_store_retriever(tmp_path: Path) -> None:
     class DummyVectorStore:
         def __init__(self, docs: list) -> None:
             self._docs = docs
@@ -46,7 +42,7 @@ def test_vector_store_retriever(monkeypatch, tmp_path: Path) -> None:
     )
     piazza_path = generate_piazza_export(tmp_path / "piazza_sample.zip")
     docs = CanvasLoader(str(canvas_path)).load() + PiazzaLoader(str(piazza_path)).load()
-    vector_store = DummyVectorStore.from_documents(docs, DummyEmbeddings())
+    vector_store = DummyVectorStore.from_documents(docs, PassThroughEmbeddings())
     retriever = VectorStoreRetriever.__new__(VectorStoreRetriever)
     object.__setattr__(retriever, "vector_store", vector_store)
     object.__setattr__(retriever, "k", 1)
