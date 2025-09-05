@@ -48,6 +48,19 @@ from rag_ed.loaders.piazza_api import PiazzaAPILoader
 posts = PiazzaAPILoader("network_id", email="user@example.com", password="pw").load()
 ```
 
+```python
+from langchain_core.documents import Document
+from rag_ed.graphs import CourseGraph
+from rag_ed.retrievers.graph import GraphRetriever
+
+graph = CourseGraph()
+graph.add_artifact("a", Document(page_content="A"))
+graph.add_artifact("b", Document(page_content="B"))
+graph.add_relationship("a", "b")
+retriever = GraphRetriever(graph)
+retriever.retrieve("a")  # returns [Document(page_content="B")]
+```
+
 ## Config
 
 - **Canvas export**: `.imscc` archive of your course.
